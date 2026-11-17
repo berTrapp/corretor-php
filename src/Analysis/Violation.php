@@ -13,6 +13,23 @@ final readonly class Violation
         public int $linha,
         public string $mensagem,
         public string $severidade = 'erro',
+        public string $stack = '',
     ) {
+    }
+
+    public function comStack(string $stack): self
+    {
+        return new self($this->regra, $this->arquivo, $this->linha, $this->mensagem, $this->severidade, $stack);
+    }
+
+    public function relativaA(string $raiz): self
+    {
+        $raiz = rtrim(str_replace('\\', '/', $raiz), '/') . '/';
+        $arquivo = str_replace('\\', '/', $this->arquivo);
+        if (str_starts_with($arquivo, $raiz)) {
+            $arquivo = substr($arquivo, strlen($raiz));
+        }
+
+        return new self($this->regra, $arquivo, $this->linha, $this->mensagem, $this->severidade, $this->stack);
     }
 }

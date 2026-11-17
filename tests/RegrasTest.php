@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Corretor\Tests;
 
 use Corretor\Analysis\Rule;
-use Corretor\Analysis\Rules\CamadasSemHttp;
-use Corretor\Analysis\Rules\ControllerLimites;
-use Corretor\Analysis\Rules\ControllerSemRegraDeNegocio;
-use Corretor\Analysis\Rules\ErrosTratamento;
-use Corretor\Analysis\Rules\GeralProibidos;
-use Corretor\Analysis\Rules\NomesDeClassesEVariaveis;
-use Corretor\Analysis\Rules\RotasConvencoes;
-use Corretor\Analysis\Rules\RotasNomeadas;
+use Corretor\Stacks\Laravel\Rules\CamadasSemHttp;
+use Corretor\Stacks\Laravel\Rules\ControllerLimites;
+use Corretor\Stacks\Laravel\Rules\ControllerSemRegraDeNegocio;
+use Corretor\Stacks\Laravel\Rules\ErrosTratamento;
+use Corretor\Stacks\Laravel\Rules\GeralProibidos;
+use Corretor\Stacks\Laravel\Rules\NomesDeClassesEVariaveis;
+use Corretor\Stacks\Laravel\Rules\RotasConvencoes;
+use Corretor\Stacks\Laravel\Rules\RotasNomeadas;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 

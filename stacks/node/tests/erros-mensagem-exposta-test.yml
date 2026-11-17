@@ -1,0 +1,7 @@
+id: erros.mensagem-exposta
+valid:
+  - "res.status(500).json({ erro: 'Falha ao processar o pedido.' })"
+  - logger.error(erro.message)
+invalid:
+  - "res.status(500).json({ erro: erro.message })"
+  - res.send(e.message)

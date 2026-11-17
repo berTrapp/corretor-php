@@ -1,0 +1,6 @@
+id: rotas.convencoes
+valid:
+  - "class A { @Get('itens-do-pedido') listar() {} }"
+invalid:
+  - "class A { @Get('itensDoPedido') listar() {} }"
+  - "@Controller('ordem_servico') class A {}"

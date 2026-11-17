@@ -1,0 +1,12 @@
+id: rotas.convencoes
+language: tsx
+severity: error
+message: Caminho de rota fora de kebab-case (sem maiúsculas nem _).
+rule:
+  pattern: "@$VERBO($CAMINHO)"
+constraints:
+  VERBO:
+    regex: '^(Controller|Get|Post|Put|Patch|Delete|All|Head|Options)$'
+  CAMINHO:
+    kind: string
+    regex: '[A-Z_]'

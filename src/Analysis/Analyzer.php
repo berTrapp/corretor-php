@@ -8,6 +8,7 @@ use FilesystemIterator;
 use Generator;
 use PhpParser\Error;
 use PhpParser\ParserFactory;
+use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -55,8 +56,20 @@ final class Analyzer
     private function arquivosPhp(string $raiz): Generator
     {
         $raiz = rtrim($raiz, DIRECTORY_SEPARATOR);
+        // Pastas ignoradas são podadas antes de entrar nelas: não são lidas
+        // (evita cópias em worktrees e pastas sem permissão, como storage/).
         $iterador = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($raiz, FilesystemIterator::SKIP_DOTS),
+            new RecursiveCallbackFilterIterator(
+                new RecursiveDirectoryIterator($raiz, FilesystemIterator::SKIP_DOTS),
+                function (SplFileInfo $info) use ($raiz): bool {
+                    if (!$info->isDir()) {
+                        return true;
+                    }
+                    $relativo = substr($info->getPathname(), strlen($raiz) + 1);
+
+                    return !$this->estaIgnorado($relativo . DIRECTORY_SEPARATOR . 'x');
+                },
+            ),
         );
 
         /** @var SplFileInfo $info */

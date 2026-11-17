@@ -1,0 +1,7 @@
+id: erros.try-catch-em-controller
+language: tsx
+severity: warning
+message: try/catch em controller; trate a exceção no filtro/middleware central de erros.
+files: ["**/*.controller.ts", "**/controllers/**"]
+rule:
+  kind: try_statement

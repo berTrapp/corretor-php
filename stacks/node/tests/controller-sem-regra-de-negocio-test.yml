@@ -1,0 +1,6 @@
+id: controller.sem-regra-de-negocio
+valid:
+  - "class PedidoController { constructor(private readonly pedidos: PedidoService) {} }"
+invalid:
+  - "class PedidoController { listar() { return this.prisma.pedido.findMany() } }"
+  - "const prisma = new PrismaClient()"

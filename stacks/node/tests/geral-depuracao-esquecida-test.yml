@@ -1,0 +1,7 @@
+id: geral.depuracao-esquecida
+valid:
+  - logger.info('pedido criado')
+  - console.error(erro)
+invalid:
+  - console.log(pedido)
+  - debugger;

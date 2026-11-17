@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/berTrapp/corretor-php/schemas/relatorio.schema.json",
+  "title": "Relatório do corretor",
+  "description": "Saída de `corretor analisar --formato=json`. Mudança incompatível sobe `versao`.",
+  "type": "object",
+  "required": ["versao", "stacks", "violacoes"],
+  "properties": {
+    "versao": { "const": 1 },
+    "stacks": { "type": "array", "items": { "type": "string" } },
+    "desligadas": {
+      "description": "Regras desligadas em .padrao.yaml, com o motivo.",
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "violacoes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["regra", "arquivo", "linha", "mensagem", "severidade", "stack"],
+        "additionalProperties": false,
+        "properties": {
+          "regra": { "type": "string", "pattern": "^[a-z]+(\\.[a-z0-9-]+)+$|^parse$" },
+          "arquivo": { "type": "string", "description": "Relativo à raiz analisada, com /." },
+          "linha": { "type": "integer", "minimum": 0 },
+          "mensagem": { "type": "string" },
+          "severidade": { "enum": ["erro", "aviso"] },
+          "stack": { "type": "string" }
+        }
+      }
+    }
+  }
+}

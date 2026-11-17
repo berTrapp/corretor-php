@@ -1,0 +1,9 @@
+id: geral.env-fora-de-config
+language: tsx
+severity: error
+message: process.env lido fora de config/; centralize a leitura e valide os valores na inicialização.
+ignores: ["**/config/**", "**/*.config.*", "**/env.*", "**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**", "**/e2e/**"]
+rule:
+  any:
+    - pattern: process.env.$NOME
+    - pattern: process.env[$NOME]

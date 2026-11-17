@@ -1,0 +1,8 @@
+# Configuração do ast-grep para a stack node.
+# Todas as regras usam o parser TSX, que lê TypeScript, JavaScript e JSX.
+ruleDirs:
+  - rules
+languageGlobs:
+  tsx: ["*.ts", "*.tsx", "*.mts", "*.cts", "*.js", "*.jsx", "*.mjs", "*.cjs"]
+testConfigs:
+  - testDir: tests

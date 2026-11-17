@@ -1,0 +1,5 @@
+id: erros.excecao-generica
+valid:
+  - throw new PedidoJaFaturadoError(pedido.id)
+invalid:
+  - throw new Error('pedido já faturado')

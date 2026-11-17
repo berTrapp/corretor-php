@@ -1,0 +1,9 @@
+#!/bin/sh
+# Copie para .git/hooks/pre-commit (ou .husky/pre-commit) e dê permissão de execução.
+set -e
+arquivos=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.mjs' '*.cjs')
+[ -z "$arquivos" ] && exit 0
+
+npx prettier --check $arquivos
+npx eslint $arquivos
+npx ast-grep scan --config "$(composer global config home 2>/dev/null)/vendor/bertrapp/corretor-php/stacks/node/sgconfig.yml" $arquivos

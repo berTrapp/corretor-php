@@ -1,0 +1,10 @@
+id: nomes.variavel-camel-case
+language: tsx
+severity: error
+message: Variável em snake_case; use camelCase (ou MAIÚSCULAS para constantes).
+rule:
+  kind: variable_declarator
+  has:
+    field: name
+    kind: identifier
+    regex: '^_?[a-z][a-z0-9]*(_[a-z0-9]+)+$'

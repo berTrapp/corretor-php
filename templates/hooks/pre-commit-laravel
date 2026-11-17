@@ -1,0 +1,13 @@
+#!/bin/sh
+# Copie para .git/hooks/pre-commit (ou use com o Husky/CaptainHook) e dê permissão de execução.
+# Verifica só os arquivos PHP preparados para o commit; o CI verifica o projeto inteiro.
+set -e
+arquivos=$(git diff --cached --name-only --diff-filter=ACMR -- '*.php')
+[ -z "$arquivos" ] && exit 0
+
+vendor/bin/pint --test $arquivos
+vendor/bin/phpstan analyse --no-progress $arquivos
+vendor/bin/corretor analisar . --stack=laravel > /dev/null || {
+  echo "corretor: há violações de severidade erro. Rode 'vendor/bin/corretor analisar' para ver."
+  exit 1
+}

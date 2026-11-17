@@ -4,25 +4,17 @@ declare(strict_types=1);
 
 namespace Corretor\Cli;
 
-/** Copia as configurações da pasta presets/ para um projeto Laravel. */
+use Corretor\Core\Config;
+use FilesystemIterator;
+
+/** Copia as configurações da pasta presets/ da stack para o projeto. */
 final class Instalar
 {
-    /** @var list<string> */
-    private const ARQUIVOS = ['pint.json', 'phpstan.neon', 'deptrac.yaml', 'rector.php', '.editorconfig'];
-
     /** @param list<string> $args */
     public static function executar(array $args): int
     {
-        $destino = getcwd() ?: '.';
-        $forcar = false;
-
-        foreach ($args as $arg) {
-            if ($arg === '--forcar') {
-                $forcar = true;
-            } else {
-                $destino = $arg;
-            }
-        }
+        $opcoes = Opcoes::ler($args);
+        $destino = rtrim($opcoes->raiz, '/\\');
 
         if (!is_dir($destino)) {
             fwrite(STDERR, "Diretório não encontrado: {$destino}\n");
@@ -30,29 +22,38 @@ final class Instalar
             return 2;
         }
 
-        $origem = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'presets';
+        $stacks = Application::stacksDoProjeto($destino, $opcoes->valor('stack'), Config::carregar($destino));
+        if (is_string($stacks)) {
+            fwrite(STDERR, $stacks);
 
-        foreach (self::ARQUIVOS as $arquivo) {
-            $de = $origem . DIRECTORY_SEPARATOR . $arquivo;
-            $para = rtrim($destino, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $arquivo;
-
-            if (file_exists($para) && !$forcar) {
-                echo "Pulado (já existe): {$arquivo}\n";
-
-                continue;
-            }
-
-            if (!copy($de, $para)) {
-                fwrite(STDERR, "Falha ao copiar {$arquivo}\n");
-
-                return 2;
-            }
-
-            echo "Instalado: {$arquivo}\n";
+            return 2;
         }
 
-        echo "\nPróximos passos: composer require --dev laravel/pint larastan/larastan phpstan/phpstan "
-            . "qossmic/deptrac driftingly/rector-laravel rector/rector\n";
+        foreach ($stacks as $stack) {
+            echo "[{$stack->nome()}]\n";
+
+            foreach (new FilesystemIterator($stack->pastaPresets()) as $info) {
+                /** @var \SplFileInfo $info */
+                $arquivo = $info->getFilename();
+                $para = $destino . DIRECTORY_SEPARATOR . $arquivo;
+
+                if (file_exists($para) && !$opcoes->flag('forcar')) {
+                    echo "Pulado (já existe): {$arquivo}\n";
+
+                    continue;
+                }
+
+                if (!copy($info->getPathname(), $para)) {
+                    fwrite(STDERR, "Falha ao copiar {$arquivo}\n");
+
+                    return 2;
+                }
+
+                echo "Instalado: {$arquivo}\n";
+            }
+
+            echo "\nPróximo passo: {$stack->dependenciasSugeridas()}\n\n";
+        }
 
         return 0;
     }

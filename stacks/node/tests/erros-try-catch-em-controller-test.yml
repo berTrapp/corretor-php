@@ -1,0 +1,5 @@
+id: erros.try-catch-em-controller
+valid:
+  - "class PedidoController { criar() { return this.pedidos.criar() } }"
+invalid:
+  - "class PedidoController { criar() { try { return this.pedidos.criar() } catch (e) { throw e } } }"

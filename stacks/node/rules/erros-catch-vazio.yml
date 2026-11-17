@@ -1,0 +1,9 @@
+id: erros.catch-vazio
+language: tsx
+severity: error
+message: catch vazio engole a exceção; registre, relance ou trate.
+rule:
+  kind: catch_clause
+  has:
+    field: body
+    regex: '^\{(\s|//[^\n]*|/\*[\s\S]*?\*/)*\}$'

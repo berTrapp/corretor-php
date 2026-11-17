@@ -1,0 +1,11 @@
+id: geral.depuracao-esquecida
+language: tsx
+severity: error
+message: Depuração esquecida (console.log/debug/dir ou debugger); remova antes de subir.
+ignores: ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**", "**/e2e/**", "**/scripts/**"]
+rule:
+  any:
+    - pattern: console.log($$$)
+    - pattern: console.debug($$$)
+    - pattern: console.dir($$$)
+    - kind: debugger_statement

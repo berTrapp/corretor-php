@@ -1,0 +1,6 @@
+id: erros.catch-vazio
+valid:
+  - try { pagar() } catch (erro) { logger.error(erro) }
+invalid:
+  - try { pagar() } catch (erro) {}
+  - try { pagar() } catch { /* nada */ }

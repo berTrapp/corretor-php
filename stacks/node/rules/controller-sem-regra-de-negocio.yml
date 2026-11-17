@@ -1,0 +1,11 @@
+id: controller.sem-regra-de-negocio
+language: tsx
+severity: error
+message: Acesso a banco no controller; mova para um service.
+files: ["**/*.controller.ts", "**/controllers/**"]
+rule:
+  any:
+    - pattern: "@InjectRepository($$$)"
+    - pattern: new PrismaClient($$$)
+    - pattern: $DB.query($$$)
+    - pattern: this.prisma.$M.$F($$$)

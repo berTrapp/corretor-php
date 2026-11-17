@@ -1,0 +1,13 @@
+id: erros.mensagem-exposta
+language: tsx
+severity: error
+message: A mensagem interna do erro é devolvida ao cliente; use uma mensagem própria.
+rule:
+  pattern: $E.message
+  inside:
+    stopBy: end
+    any:
+      - pattern: $RES.json($$$)
+      - pattern: $RES.send($$$)
+      - pattern: $RES.status($S).json($$$)
+      - pattern: $RES.status($S).send($$$)

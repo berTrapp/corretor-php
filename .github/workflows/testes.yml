@@ -1,0 +1,25 @@
+name: testes
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm i -g @ast-grep/cli
+      - run: composer install --no-interaction --prefer-dist
+      - name: Regras PHP e núcleo
+        run: vendor/bin/phpunit
+      - name: Regras ast-grep (node)
+        run: ast-grep test --config stacks/node/sgconfig.yml --skip-snapshot-tests

@@ -1,0 +1,7 @@
+id: erros.excecao-generica
+language: tsx
+severity: warning
+message: throw new Error genérico; crie uma classe de erro de domínio (em errors/ ou exceptions/).
+ignores: ["**/errors/**", "**/exceptions/**", "**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**", "**/e2e/**"]
+rule:
+  pattern: throw new Error($$$)

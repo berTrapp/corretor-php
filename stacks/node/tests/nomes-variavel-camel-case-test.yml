@@ -1,0 +1,6 @@
+id: nomes.variavel-camel-case
+valid:
+  - const pedidoAtual = 1
+  - const MAX_TENTATIVAS = 3
+invalid:
+  - const pedido_atual = 1

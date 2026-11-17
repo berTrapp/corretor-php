@@ -1,0 +1,38 @@
+# Copie para .github/workflows/padrao.yml no projeto Node/TypeScript.
+# O corretor é um pacote PHP: o job instala PHP só para rodá-lo.
+name: padrao
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  padrao:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Formatação (Prettier)
+        run: npx prettier --check .
+      - name: Lint (ESLint)
+        run: npx eslint .
+      - name: Tipos (tsc)
+        run: npx tsc --noEmit
+      - name: Camadas (dependency-cruiser)
+        run: npx depcruise src --config .dependency-cruiser.cjs
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+          coverage: none
+      - name: Padrão (corretor)
+        run: |
+          composer global require bertrapp/corretor-php
+          PATH="$PATH:$(pwd)/node_modules/.bin" "$(composer global config bin-dir --absolute)/corretor" analisar . --stack=node
+      - name: Testes
+        run: npm test

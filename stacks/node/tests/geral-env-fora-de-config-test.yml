@@ -1,0 +1,6 @@
+id: geral.env-fora-de-config
+valid:
+  - const porta = config.porta
+invalid:
+  - const porta = process.env.PORT
+  - const chave = process.env['API_KEY']

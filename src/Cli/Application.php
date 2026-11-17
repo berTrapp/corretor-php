@@ -4,24 +4,19 @@ declare(strict_types=1);
 
 namespace Corretor\Cli;
 
-use Corretor\Analysis\Analyzer;
-use Corretor\Analysis\Rule;
-use Corretor\Analysis\Rules\CamadasSemHttp;
-use Corretor\Analysis\Rules\ControllerLimites;
-use Corretor\Analysis\Rules\ControllerSemRegraDeNegocio;
-use Corretor\Analysis\Rules\ErrosTratamento;
-use Corretor\Analysis\Rules\GeralProibidos;
-use Corretor\Analysis\Rules\NomesDeClassesEVariaveis;
-use Corretor\Analysis\Rules\RotasConvencoes;
-use Corretor\Analysis\Rules\RotasNomeadas;
-use Corretor\Analysis\Rules\ValidacaoEmFormRequest;
+use Corretor\Analysis\Violation;
+use Corretor\Core\Config;
+use Corretor\Core\Stack;
+use Corretor\Core\Stacks;
 use Corretor\Report\Relatorio;
+use RuntimeException;
 
 final class Application
 {
     /**
      * Ponto de entrada. Retorna o código de saída do processo:
-     * 0 = sem violações (ou instalação feita), 1 = há violações, 2 = erro de uso.
+     * 0 = nenhuma violação de severidade erro, 1 = há erros, 2 = erro de uso.
+     * Avisos não mudam o código de saída: são para revisão.
      *
      * @param list<string> $argv
      */
@@ -40,33 +35,44 @@ final class Application
     /** @param list<string> $args */
     private static function analisar(array $args): int
     {
-        $raiz = getcwd() ?: '.';
-        $formato = 'md';
-        $saida = null;
-
-        foreach ($args as $arg) {
-            if (str_starts_with($arg, '--formato=')) {
-                $formato = substr($arg, strlen('--formato='));
-            } elseif (str_starts_with($arg, '--saida=')) {
-                $saida = substr($arg, strlen('--saida='));
-            } else {
-                $raiz = $arg;
-            }
-        }
+        $opcoes = Opcoes::ler($args);
+        $raiz = rtrim($opcoes->raiz, '/\\');
+        $formato = $opcoes->valor('formato') ?? 'md';
+        $saida = $opcoes->valor('saida');
 
         if (!in_array($formato, ['md', 'json'], true)) {
             return self::erro("Formato inválido: {$formato} (use md ou json)\n");
         }
-
         if (!is_dir($raiz)) {
             return self::erro("Diretório não encontrado: {$raiz}\n");
         }
 
-        $violacoes = (new Analyzer(self::regrasPadrao()))->analisar($raiz);
+        $config = Config::carregar($raiz);
+        $stacks = self::stacksDoProjeto($raiz, $opcoes->valor('stack'), $config);
+        if (is_string($stacks)) {
+            return self::erro($stacks);
+        }
 
+        $violacoes = $config->problemas;
+        foreach ($stacks as $stack) {
+            try {
+                foreach ($stack->analisar($raiz, $config) as $violacao) {
+                    $violacoes[] = $violacao->comStack($stack->nome());
+                }
+            } catch (RuntimeException $e) {
+                return self::erro("[{$stack->nome()}] {$e->getMessage()}\n");
+            }
+        }
+
+        $violacoes = array_values(array_filter(
+            array_map(static fn (Violation $v): Violation => $v->relativaA($raiz), $violacoes),
+            static fn (Violation $v): bool => !$config->desligada($v->regra),
+        ));
+
+        $nomes = array_map(static fn (Stack $s): string => $s->nome(), $stacks);
         $conteudo = $formato === 'json'
-            ? Relatorio::json($violacoes)
-            : Relatorio::markdown($violacoes, $raiz);
+            ? Relatorio::json($violacoes, $nomes, $config->desligadas)
+            : Relatorio::markdown($violacoes, $raiz, $nomes, $config->desligadas);
 
         if ($saida !== null) {
             file_put_contents($saida, $conteudo);
@@ -75,29 +81,43 @@ final class Application
             echo $conteudo;
         }
 
-        return $violacoes === [] ? 0 : 1;
+        foreach ($violacoes as $violacao) {
+            if ($violacao->severidade === 'erro') {
+                return 1;
+            }
+        }
+
+        return 0;
     }
 
-    /** @return list<Rule> */
-    public static function regrasPadrao(): array
+    /** @return list<Stack>|string lista de stacks ou mensagem de erro */
+    public static function stacksDoProjeto(string $raiz, ?string $opcao, Config $config): array|string
     {
-        return [
-            // Estrutura e nomes
-            new NomesDeClassesEVariaveis(),
-            // Controllers
-            new ControllerSemRegraDeNegocio(),
-            new ValidacaoEmFormRequest(),
-            new ControllerLimites(),
-            // Rotas
-            new RotasNomeadas(),
-            new RotasConvencoes(),
-            // Services e models
-            new CamadasSemHttp(),
-            // Erros
-            new ErrosTratamento(),
-            // Geral
-            new GeralProibidos(),
-        ];
+        $nomes = $opcao !== null ? explode(',', $opcao) : $config->stacks;
+
+        if ($nomes === []) {
+            $detectadas = Stacks::detectar($raiz);
+
+            return $detectadas !== []
+                ? $detectadas
+                : "Nenhuma stack detectada em {$raiz}. Use --stack=" . self::nomesDisponiveis() . "\n";
+        }
+
+        $stacks = [];
+        foreach ($nomes as $nome) {
+            $stack = Stacks::porNome(trim($nome));
+            if ($stack === null) {
+                return "Stack desconhecida: {$nome} (disponíveis: " . self::nomesDisponiveis() . ")\n";
+            }
+            $stacks[] = $stack;
+        }
+
+        return $stacks;
+    }
+
+    private static function nomesDisponiveis(): string
+    {
+        return implode(', ', array_map(static fn (Stack $s): string => $s->nome(), Stacks::todas()));
     }
 
     private static function ajuda(): int
@@ -116,20 +136,25 @@ final class Application
 
     private static function textoAjuda(): string
     {
+        $stacks = self::nomesDisponiveis();
+
         return <<<TEXTO
-        corretor — verifica e padroniza projetos Laravel
+        corretor — verifica e padroniza projetos ({$stacks})
 
         Uso:
-          corretor analisar [caminho] [--formato=md|json] [--saida=arquivo]
-          corretor instalar [caminho] [--forcar]
+          corretor analisar [caminho] [--stack=nome[,nome]] [--formato=md|json] [--saida=arquivo]
+          corretor instalar [caminho] [--stack=nome] [--forcar]
 
         analisar   gera o relatório de violações (não altera arquivos)
-        instalar   copia as configurações (Pint, PHPStan, Deptrac, Rector, EditorConfig)
-                   para o projeto; --forcar sobrescreve as que já existem
+        instalar   copia as configurações da stack (formatador, análise estática,
+                   camadas, EditorConfig) para o projeto; --forcar sobrescreve
+
+        Sem --stack, a stack vem de .padrao.yaml ou é detectada (artisan, package.json).
+        Regras podem ser desligadas em .padrao.yaml, sempre com motivo.
 
         Códigos de saída:
-          0  sem violações
-          1  há violações
+          0  nenhum erro (avisos não bloqueiam)
+          1  há violações de severidade erro
           2  erro de uso
 
         TEXTO;

@@ -1,0 +1,28 @@
+# Copie para .github/workflows/padrao.yml no projeto Laravel.
+name: padrao
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  padrao:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - name: Formatação (Pint)
+        run: vendor/bin/pint --test
+      - name: Tipos (PHPStan + Larastan)
+        run: vendor/bin/phpstan analyse --no-progress
+      - name: Camadas (Deptrac)
+        run: vendor/bin/deptrac analyse --no-progress
+      - name: Padrão (corretor)
+        run: vendor/bin/corretor analisar . --stack=laravel --formato=md
+      - name: Testes
+        run: php artisan test

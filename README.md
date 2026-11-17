@@ -1,36 +1,60 @@
-# corretor-php (padrão Laravel)
+# corretor-php
 
-Padrão global para projetos Laravel, com ferramenta para verificar e ajudar a corrigir. O guia completo, com as regras, identificadores e fontes, está em [`docs/PADRAO.md`](docs/PADRAO.md).
+Padrão de código verificável por ferramenta, aplicável a qualquer projeto. Stacks suportadas: **Laravel** e **Node/TypeScript**.
 
-## Peças
+O piso são as ferramentas oficiais de cada stack (formatador, análise estática, camadas). O `corretor` só verifica o que elas não cobrem, e dá às regras o mesmo identificador entre stacks quando a intenção é a mesma.
 
-1. **`docs/PADRAO.md`:** o padrão: estrutura de pastas, nomes (classes, métodos, variáveis, rotas, tabelas), camadas, controllers, services, models, erros, banco, segurança e testes.
-2. **`presets/`:** configurações prontas para copiar em qualquer projeto: Pint (PER), PHPStan com Larastan (nível 8), Deptrac (dependências entre camadas), Rector e EditorConfig.
-3. **`bin/corretor`:** CLI que verifica o código contra as regras automatizáveis e gera um relatório. Não altera arquivos.
-4. **`skills/padronizar-laravel/`:** skill do Claude que aplica o padrão com diagnóstico, plano aprovado, correção em pequenos passos e validação.
+| Stack | Padrão | Motor das regras | Ferramentas oficiais (presets) |
+|---|---|---|---|
+| `laravel` | [`stacks/laravel/docs/PADRAO.md`](stacks/laravel/docs/PADRAO.md) | PHP (nikic/php-parser) | Pint, PHPStan + Larastan, Deptrac, Rector |
+| `node` | [`stacks/node/docs/PADRAO.md`](stacks/node/docs/PADRAO.md) | [ast-grep](https://ast-grep.github.io), regras em YAML | Prettier, ESLint + typescript-eslint, `tsc --strict`, dependency-cruiser |
 
-## Instalação em um projeto
+## Uso
+
+Laravel:
 
 ```bash
-composer require --dev user/corretor-php
-composer require --dev laravel/pint larastan/larastan phpstan/phpstan qossmic/deptrac driftingly/rector-laravel rector/rector
-
-vendor/bin/corretor instalar          # copia presets/ para a raiz do projeto
+composer require --dev bertrapp/corretor-php
+vendor/bin/corretor instalar          # copia os presets da stack para a raiz do projeto
 vendor/bin/corretor analisar          # relatório no terminal
 ```
 
-Use `vendor/bin/corretor analisar . --formato=json --saida=padrao-relatorio.json` para gerar o JSON que o skill lê.
+Node/TypeScript (o corretor é um pacote PHP; o ast-grep vem do npm):
 
-Códigos de saída: `0` sem violações, `1` com violações, `2` erro de uso. Use `1` para bloquear merge no CI.
+```bash
+composer global require bertrapp/corretor-php
+npm i -D @ast-grep/cli
+corretor instalar
+corretor analisar
+```
 
-## Regras automatizadas
+Opções:
+
+- `--stack=laravel|node` força a stack. Sem ela, vale o `stack:` do `.padrao.yaml` ou a detecção (`artisan` → laravel, `package.json` → node).
+- `--formato=json --saida=padrao-relatorio.json` gera o JSON que o skill e o CI leem. O formato está em [`schemas/relatorio.schema.json`](schemas/relatorio.schema.json).
+
+Códigos de saída: `0` sem erros, `1` com violação de severidade **erro** (bloqueia o merge), `2` erro de uso. Avisos não mudam o código de saída: são para revisão.
+
+## Exceções por projeto: `.padrao.yaml`
+
+```yaml
+stack: laravel
+desligar:
+  - regra: controller.consulta-eloquent-direta
+    motivo: "Controllers de relatório só leem; migrar para services no módulo financeiro."
+nomes-curtos-permitidos: [nf, cd]
+```
+
+Regra desligada sem `motivo` continua ligada e gera o erro `config.excecao-sem-motivo`. As regras desligadas aparecem no relatório.
+
+## Regras automatizadas: Laravel
 
 | Regra | O que verifica | Severidade |
 |---|---|---|
 | `nomes.sufixo-da-classe` | classe sem o sufixo do diretório (`Controller`, `Service`...) | aviso |
 | `nomes.metodo-camel-case` | método fora de camelCase | erro |
 | `nomes.variavel-camel-case` | variável fora de camelCase | erro |
-| `nomes.variavel-abreviada` | variável de uma ou duas letras (exceto `$i`, `$j`, `$k`, `$e`) | aviso |
+| `nomes.variavel-abreviada` | variável de uma ou duas letras (exceto `$i`, `$j`, `$k`, `$e`, `$id`, `$uf`, `$ip`, `$db`, `$os` e as de `.padrao.yaml`); uma vez por arquivo | aviso |
 | `controller.sem-regra-de-negocio` | `DB::`, `Http::`, `Mail::` ou `Schema::` em controller | erro |
 | `controller.validacao-em-form-request` | `->validate()` inline em controller | erro |
 | `controller.limite-metodos` | controller com mais de 7 métodos públicos | aviso |
@@ -46,31 +70,61 @@ Códigos de saída: `0` sem violações, `1` com violações, `2` erro de uso. U
 | `geral.depuracao-esquecida` | `dd`, `dump`, `var_dump`, `print_r`, `ray` | erro |
 | `geral.env-fora-de-config` | `env()` fora de `config/` | erro |
 
-O que não é automatizado (decisões de domínio, tratamento de erro, desenho de API, banco) está descrito em `docs/PADRAO.md` e é verificado em revisão de código.
+## Regras automatizadas: Node/TypeScript
+
+| Regra | O que verifica | Severidade |
+|---|---|---|
+| `geral.depuracao-esquecida` | `console.log/debug/dir`, `debugger` (fora de testes e scripts) | erro |
+| `geral.env-fora-de-config` | `process.env` fora de `config/` | erro |
+| `erros.catch-vazio` | `catch` sem instruções | erro |
+| `erros.excecao-generica` | `throw new Error(...)` fora de `errors/` ou `exceptions/` | aviso |
+| `erros.mensagem-exposta` | `erro.message` em `res.json/send` | erro |
+| `erros.try-catch-em-controller` | `try/catch` em `*.controller.ts` ou `controllers/` | aviso |
+| `controller.sem-regra-de-negocio` | `@InjectRepository`, `new PrismaClient`, `this.prisma.x.y()` ou `.query()` em controller | erro |
+| `rotas.convencoes` | caminho de `@Controller/@Get/@Post...` com maiúscula ou `_` | erro |
+| `nomes.variavel-camel-case` | variável em snake_case | erro |
+
+O que não é automatizado (decisões de domínio, desenho de API, banco) está no `PADRAO.md` de cada stack e é verificado em revisão de código.
+
+## CI e hooks
+
+- `templates/ci/<stack>.yml`: GitHub Actions que roda formatador, análise estática, camadas, o corretor e os testes. Copie para `.github/workflows/padrao.yml`.
+- `templates/hooks/pre-commit-<stack>`: verificação rápida dos arquivos do commit.
 
 ## Estrutura do pacote
 
 ```
-bin/corretor                          executável
-docs/PADRAO.md                        o padrão, com identificadores e fontes
-presets/                              configurações copiadas para os projetos
-skills/padronizar-laravel/SKILL.md    skill do Claude
-src/Cli/                              comandos analisar e instalar
-src/Analysis/                         analisador, contrato das regras, auxiliares
-src/Analysis/Rules/                   regras concretas
-src/Report/Relatorio.php              relatório em md e json
-tests/RegrasTest.php                  um caso que gera violação e um que passa, por regra
+bin/corretor                         executável
+src/Core/                            contrato Stack, registro das stacks, .padrao.yaml
+src/Cli/                             comandos analisar e instalar
+src/Analysis/                        motor PHP: analisador, contrato Rule, Violation
+src/Adapters/AstGrep.php             motor das stacks não PHP
+src/Report/Relatorio.php             relatório em md e json
+schemas/relatorio.schema.json        contrato do relatório (versionado)
+stacks/laravel/                      docs/, presets/, skills/, src/ (regras PHP)
+stacks/node/                         docs/, presets/, rules/ (YAML), tests/ (casos do ast-grep)
+templates/ci/, templates/hooks/      por stack
+tests/                               PHPUnit: regras Laravel, núcleo e stack node
 ```
 
 ## Como adicionar uma regra
 
-1. Crie uma classe em `src/Analysis/Rules/` que implemente `Rule`.
-2. Defina `nome()` no formato `grupo.nome-da-regra`.
-3. Em `verificar()`, use `NodeFinder` para achar os nós e devolva `Violation`s. Use `Caminho::contem()` para checar pastas, porque ele funciona em Windows e Linux.
-4. Registre a regra em `Application::regrasPadrao()`.
-5. Adicione o identificador à tabela de `docs/PADRAO.md` e à tabela acima.
-6. Escreva um caso que deve gerar violação e outro que não deve em `tests/RegrasTest.php`.
+**Laravel (PHP):** crie uma classe em `stacks/laravel/src/Rules/` que implemente `Rule`, registre em `LaravelStack::regras()` e escreva em `tests/RegrasTest.php` um caso que gera violação e outro que passa. Use `Caminho::contem()` para pastas.
 
-## Status
+**Node (YAML):** crie `stacks/node/rules/<id>.yml` e `stacks/node/tests/<id>-test.yml` com casos `valid` e `invalid`. Rode `ast-grep test --config stacks/node/sgconfig.yml --skip-snapshot-tests`.
 
-Ainda não foi executado de ponta a ponta. Os testes e a CLI dependem de `composer install` (`nikic/php-parser` e `phpunit`). Os presets dependem das versões das ferramentas (Pint, Larastan, Deptrac, Rector): confira a sintaxe com a versão instalada antes de usar no CI.
+Em ambos: `id` no formato `grupo.nome-da-regra`, igual ao de outra stack quando a intenção é a mesma; adicione-o ao `PADRAO.md` da stack, à tabela acima e ao `CHANGELOG.md`, com o motivo.
+
+## Testes
+
+```bash
+composer install
+vendor/bin/phpunit
+npx -p @ast-grep/cli ast-grep test --config stacks/node/sgconfig.yml --skip-snapshot-tests
+```
+
+## Novas stacks
+
+1. Crie `stacks/<nome>/` com `docs/PADRAO.md`, `presets/` e as regras (YAML do ast-grep sempre que possível).
+2. Implemente `Corretor\Core\Stack` e registre em `Stacks::todas()`.
+3. Termine com testes passando e uma análise de um projeto real da stack.

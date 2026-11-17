@@ -2,3 +2,4 @@
 composer.lock
 .phpunit.result.cache
 corretor-relatorio.json
+.phpunit.cache/

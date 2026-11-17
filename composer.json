@@ -1,18 +1,21 @@
 {
-    "name": "user/corretor-php",
-    "description": "Analisa projetos PHP/Laravel e aponta (e ajuda a corrigir) violações das convenções do time.",
+    "name": "bertrapp/corretor-php",
+    "description": "Padrão de código verificável por ferramenta: analisa projetos Laravel e Node/TypeScript e aponta violações das convenções do time.",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "nikic/php-parser": "^5.0"
+        "nikic/php-parser": "^5.0",
+        "symfony/yaml": "^7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.0"
     },
     "autoload": {
         "psr-4": {
-            "Corretor\\": "src/"
+            "Corretor\\": "src/",
+            "Corretor\\Stacks\\Laravel\\": "stacks/laravel/src/",
+            "Corretor\\Stacks\\Node\\": "stacks/node/src/"
         }
     },
     "autoload-dev": {
@@ -22,5 +25,8 @@
     },
     "bin": [
         "bin/corretor"
-    ]
+    ],
+    "suggest": {
+        "ast-grep/cli (npm @ast-grep/cli)": "Necessário para analisar a stack node."
+    }
 }
