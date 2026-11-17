@@ -205,10 +205,10 @@ Este padrão adota **services**, e não actions. Repositórios não são obrigat
 
 | ID | Regra | Verificação |
 |---|---|---|
-| ERR-01 | Erros de regra de negócio são exceções de domínio (`PedidoJaFaturado`), não `Exception` genérica. | revisão |
-| ERR-02 | Exceções de domínio são tratadas em um único lugar (`bootstrap/app.php` ou o `Handler`). | revisão |
-| ERR-03 | Mensagens de erro para o usuário não expõem stack trace, SQL ou nomes internos. | revisão |
-| ERR-04 | Nunca engolir exceção com `catch` vazio. | revisão |
+| ERR-01 | Erros de regra de negócio são exceções de domínio (`PedidoJaFaturado`), não `Exception` genérica. | `erros.excecao-generica` |
+| ERR-02 | Exceções de domínio são tratadas em um único lugar (`bootstrap/app.php` ou o `Handler`). | `erros.try-catch-em-controller`, `erros.handler-central-vazio` |
+| ERR-03 | Mensagens de erro para o usuário não expõem stack trace, SQL ou nomes internos. | `erros.mensagem-exposta` |
+| ERR-04 | Nunca engolir exceção com `catch` vazio. | `erros.catch-vazio` |
 
 ## 7. Banco e Eloquent
 

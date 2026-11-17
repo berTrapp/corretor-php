@@ -12,7 +12,7 @@ Padrão global para projetos Laravel, com ferramenta para verificar e ajudar a c
 ## Instalação em um projeto
 
 ```bash
-composer require --dev bertrapp/corretor-php
+composer require --dev user/corretor-php
 composer require --dev laravel/pint larastan/larastan phpstan/phpstan qossmic/deptrac driftingly/rector-laravel rector/rector
 
 vendor/bin/corretor instalar          # copia presets/ para a raiz do projeto
@@ -38,6 +38,11 @@ Códigos de saída: `0` sem violações, `1` com violações, `2` erro de uso. U
 | `rotas.nomeadas` | rota sem `->name()` ou nome fora de `recurso.acao` | erro |
 | `rotas.convencoes` | URI fora de kebab-case, com verbo, ou closure com mais de uma instrução | erro / aviso |
 | `camadas.sem-http` | `request()`, `response()`, `redirect()`, `session()` ou `back()` em service ou model | erro |
+| `erros.excecao-generica` | `throw new Exception/RuntimeException/LogicException/ErrorException` fora de `app/Exceptions` | aviso |
+| `erros.try-catch-em-controller` | `try/catch` em controller | aviso |
+| `erros.handler-central-vazio` | `withExceptions()` vazio em `bootstrap/app.php` | aviso |
+| `erros.mensagem-exposta` | `$e->getMessage()` dentro de `return` em `app/Http` | erro |
+| `erros.catch-vazio` | `catch` sem instruções | erro |
 | `geral.depuracao-esquecida` | `dd`, `dump`, `var_dump`, `print_r`, `ray` | erro |
 | `geral.env-fora-de-config` | `env()` fora de `config/` | erro |
 

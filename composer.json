@@ -1,5 +1,5 @@
 {
-    "name": "bertrapp/corretor-php",
+    "name": "user/corretor-php",
     "description": "Analisa projetos PHP/Laravel e aponta (e ajuda a corrigir) violações das convenções do time.",
     "type": "library",
     "license": "MIT",

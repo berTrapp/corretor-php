@@ -8,6 +8,7 @@ use Corretor\Analysis\Rule;
 use Corretor\Analysis\Rules\CamadasSemHttp;
 use Corretor\Analysis\Rules\ControllerLimites;
 use Corretor\Analysis\Rules\ControllerSemRegraDeNegocio;
+use Corretor\Analysis\Rules\ErrosTratamento;
 use Corretor\Analysis\Rules\GeralProibidos;
 use Corretor\Analysis\Rules\NomesDeClassesEVariaveis;
 use Corretor\Analysis\Rules\RotasConvencoes;
@@ -139,5 +140,59 @@ final class RegrasTest extends TestCase
         $violacoes = $this->verificar($regra, self::CONTROLLER, $codigo);
         $this->assertCount(1, $violacoes);
         $this->assertSame('controller.limite-metodos', $violacoes[0]->regra);
+    }
+
+    /** @return list<string> */
+    private function regrasDeErro(string $arquivo, string $codigo): array
+    {
+        return array_map(fn ($v) => $v->regra, $this->verificar(new ErrosTratamento(), $arquivo, $codigo));
+    }
+
+    public function testExcecaoGenericaGeraAviso(): void
+    {
+        $codigo = '<?php class PedidoService { public function f() { throw new \\RuntimeException("x"); } }';
+        $this->assertSame(['erros.excecao-generica'], $this->regrasDeErro('/projeto/app/Services/PedidoService.php', $codigo));
+    }
+
+    public function testExcecaoDeDominioPassa(): void
+    {
+        $codigo = '<?php class PedidoService { public function f() { throw new PedidoJaFaturado(); } }';
+        $this->assertSame([], $this->regrasDeErro('/projeto/app/Services/PedidoService.php', $codigo));
+    }
+
+    public function testExcecaoGenericaEmAppExceptionsPassa(): void
+    {
+        $codigo = '<?php class Base { public function f() { throw new Exception("x"); } }';
+        $this->assertSame([], $this->regrasDeErro('/projeto/app/Exceptions/Base.php', $codigo));
+    }
+
+    public function testTryCatchEmControllerEMensagemExposta(): void
+    {
+        $codigo = '<?php class PedidoController { public function f() { try { x(); } catch (\\Throwable $e) { return response()->json(["erro" => $e->getMessage()]); } } }';
+        $this->assertSame(['erros.try-catch-em-controller', 'erros.mensagem-exposta'], $this->regrasDeErro(self::CONTROLLER, $codigo));
+    }
+
+    public function testTryCatchForaDeControllerComLogPassa(): void
+    {
+        $codigo = '<?php class Job { public function f() { try { x(); } catch (\\Throwable $e) { report($e); } } }';
+        $this->assertSame([], $this->regrasDeErro('/projeto/app/Jobs/Job.php', $codigo));
+    }
+
+    public function testCatchVazioGeraErro(): void
+    {
+        $codigo = '<?php class Job { public function f() { try { x(); } catch (\\Throwable $e) { /* nada */ } } }';
+        $this->assertSame(['erros.catch-vazio'], $this->regrasDeErro('/projeto/app/Jobs/Job.php', $codigo));
+    }
+
+    public function testWithExceptionsVazioGeraAviso(): void
+    {
+        $codigo = '<?php return Application::configure()->withExceptions(function (Exceptions $exceptions) { })->create();';
+        $this->assertSame(['erros.handler-central-vazio'], $this->regrasDeErro('/projeto/bootstrap/app.php', $codigo));
+    }
+
+    public function testWithExceptionsComTratamentoPassa(): void
+    {
+        $codigo = '<?php return Application::configure()->withExceptions(function (Exceptions $exceptions) { $exceptions->render(fn (PedidoJaFaturado $e) => null); })->create();';
+        $this->assertSame([], $this->regrasDeErro('/projeto/bootstrap/app.php', $codigo));
     }
 }

@@ -9,6 +9,7 @@ use Corretor\Analysis\Rule;
 use Corretor\Analysis\Rules\CamadasSemHttp;
 use Corretor\Analysis\Rules\ControllerLimites;
 use Corretor\Analysis\Rules\ControllerSemRegraDeNegocio;
+use Corretor\Analysis\Rules\ErrosTratamento;
 use Corretor\Analysis\Rules\GeralProibidos;
 use Corretor\Analysis\Rules\NomesDeClassesEVariaveis;
 use Corretor\Analysis\Rules\RotasConvencoes;
@@ -92,6 +93,8 @@ final class Application
             new RotasConvencoes(),
             // Services e models
             new CamadasSemHttp(),
+            // Erros
+            new ErrosTratamento(),
             // Geral
             new GeralProibidos(),
         ];
