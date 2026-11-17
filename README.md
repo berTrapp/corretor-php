@@ -74,7 +74,7 @@ Regra desligada sem `motivo` continua ligada e gera o erro `config.excecao-sem-m
 
 | Regra | O que verifica | Severidade |
 |---|---|---|
-| `geral.depuracao-esquecida` | `console.log/debug/dir`, `debugger` (fora de testes e scripts) | erro |
+| `geral.depuracao-esquecida` | `console.log/debug/dir`, `debugger` (fora de testes, `scripts/` e `bin/`) | erro |
 | `geral.env-fora-de-config` | `process.env` fora de `config/` | erro |
 | `erros.catch-vazio` | `catch` sem instruções | erro |
 | `erros.excecao-generica` | `throw new Error(...)` fora de `errors/` ou `exceptions/` | aviso |
@@ -83,6 +83,7 @@ Regra desligada sem `motivo` continua ligada e gera o erro `config.excecao-sem-m
 | `controller.sem-regra-de-negocio` | `@InjectRepository`, `new PrismaClient`, `this.prisma.x.y()` ou `.query()` em controller | erro |
 | `rotas.convencoes` | caminho de `@Controller/@Get/@Post...` com maiúscula ou `_` | erro |
 | `nomes.variavel-camel-case` | variável em snake_case | erro |
+| `camadas.sem-http` | `throw new HttpException/NotFoundException...` em service | aviso |
 
 O que não é automatizado (decisões de domínio, desenho de API, banco) está no `PADRAO.md` de cada stack e é verificado em revisão de código.
 

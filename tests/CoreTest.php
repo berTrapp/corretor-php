@@ -91,6 +91,7 @@ final class CoreTest extends TestCase
             'pedido.controller.ts erros.mensagem-exposta',
             'pedido.controller.ts erros.try-catch-em-controller',
             'pedido.controller.ts rotas.convencoes',
+            'pedido.service.ts camadas.sem-http',
             'pedido.service.ts erros.catch-vazio',
             'pedido.service.ts erros.excecao-generica',
             'pedido.service.ts geral.depuracao-esquecida',

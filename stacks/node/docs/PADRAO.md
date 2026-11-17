@@ -25,7 +25,7 @@ O piso são as ferramentas oficiais (`presets/`): Prettier formata, ESLint com t
 |---|---|---|
 | CTR-01 | Controllers recebem a requisição, chamam um service e devolvem a resposta. Sem acesso a banco. | `controller.sem-regra-de-negocio` |
 | CTR-02 | Entrada validada por DTO (class-validator, zod), não por `if` no controller. | revisão |
-| SRV-01 | Services não conhecem HTTP (`req`, `res`, controllers). | dependency-cruiser |
+| SRV-01 | Services não conhecem HTTP (`req`, `res`, controllers, `HttpException`). | dependency-cruiser, `camadas.sem-http` |
 
 ## 4. Rotas
 

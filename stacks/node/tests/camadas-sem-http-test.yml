@@ -1,0 +1,6 @@
+id: camadas.sem-http
+valid:
+  - throw new PedidoNaoEncontradoError(id)
+invalid:
+  - throw new HttpException('erro', 400)
+  - throw new NotFoundException()

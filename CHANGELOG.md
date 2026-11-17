@@ -11,6 +11,7 @@ Toda entrada de regra diz o identificador e o motivo.
 ## [Não publicado]
 
 ### Adicionado
+- `camadas.sem-http` (node, aviso): exceção HTTP lançada em service.
 - Stack **node** (Node/TypeScript), com regras em YAML executadas pelo ast-grep: `geral.depuracao-esquecida`, `geral.env-fora-de-config`, `erros.catch-vazio`, `erros.excecao-generica`, `erros.mensagem-exposta`, `erros.try-catch-em-controller`, `controller.sem-regra-de-negocio`, `rotas.convencoes`, `nomes.variavel-camel-case`. Os IDs são os mesmos do Laravel quando a intenção é a mesma.
 - Presets node: ESLint (typescript-eslint estrito), `tsconfig.padrao.json`, Prettier, dependency-cruiser, EditorConfig.
 - `.padrao.yaml`: escolha de stack, regras desligadas **com motivo obrigatório** (sem motivo vira `config.excecao-sem-motivo`) e `nomes-curtos-permitidos`.
@@ -26,6 +27,13 @@ Toda entrada de regra diz o identificador e o motivo.
 - Deptrac sugerido como `deptrac/deptrac` (nome do pacote a partir da versão 2).
 
 ### Corrigido
+- Presets validados com as versões atuais em projetos públicos (koel, nestjs-boilerplate):
+  - `phpstan.neon`: removido `checkMissingIterableValueType`, que não existe no PHPStan 2 e impedia a execução.
+  - `deptrac.yaml`: collector `className` (removido no Deptrac 4) trocado por `directory`.
+  - `rector.php`: regras do rector-laravel ativadas com `withComposerBased(laravel: true)`.
+  - `eslint.config.mjs`: aceita classes vazias com decorator (`@Module` do NestJS) e propriedades de classe em MAIÚSCULAS (classes de variáveis de ambiente).
+- `nomes.variavel-camel-case` (Laravel) ignora superglobais (`$_ENV`, `$_SERVER`...).
+- `geral.depuracao-esquecida` (node) ignora `bin/`.
 - `nomes.variavel-abreviada`: aceita `id`, `uf`, `ip`, `db`, `os`, e cada variável é reportada uma vez por arquivo, não a cada uso.
 
 ## [0.1.0]

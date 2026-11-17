@@ -1,0 +1,10 @@
+id: camadas.sem-http
+language: tsx
+severity: warning
+message: Service lança exceção HTTP; lance um erro de domínio e converta em HTTP no exception filter.
+files: ["**/*.service.ts", "**/services/**"]
+rule:
+  pattern: throw new $EXC($$$)
+constraints:
+  EXC:
+    regex: '^(HttpException|BadRequestException|UnauthorizedException|ForbiddenException|NotFoundException|ConflictException|UnprocessableEntityException|InternalServerErrorException)$'

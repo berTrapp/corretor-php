@@ -195,4 +195,12 @@ final class RegrasTest extends TestCase
         $codigo = '<?php return Application::configure()->withExceptions(function (Exceptions $exceptions) { $exceptions->render(fn (PedidoJaFaturado $e) => null); })->create();';
         $this->assertSame([], $this->regrasDeErro('/projeto/bootstrap/app.php', $codigo));
     }
+
+    public function testSuperglobaisNaoSaoVariaveisForaDoPadrao(): void
+    {
+        $codigo = '<?php $porta = $_ENV["PORT"] ?? $_SERVER["PORT"];';
+        $violacoes = $this->verificar(new NomesDeClassesEVariaveis(), '/projeto/bootstrap/app.php', $codigo);
+
+        $this->assertSame([], $violacoes);
+    }
 }

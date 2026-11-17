@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-// Refatorações automáticas. Rode com: vendor/bin/rector --dry-run (primeiro) e depois sem --dry-run.
-// Para os conjuntos específicos do Laravel, instale driftingly/rector-laravel e confira
-// o namespace do LaravelSetList na versão instalada antes de adicioná-lo com ->withSets().
+// Refatorações automáticas (Rector 2 + driftingly/rector-laravel 2).
+// Rode primeiro com --dry-run e revise; depois sem --dry-run, em um commit separado.
+// withComposerBased(laravel: true) aplica as regras do rector-laravel que valem
+// para a versão do Laravel instalada no projeto.
 
 use Rector\Config\RectorConfig;
 
@@ -14,6 +15,7 @@ return RectorConfig::configure()
         __DIR__ . '/routes',
         __DIR__ . '/config',
     ])
+    ->withComposerBased(laravel: true)
     ->withPreparedSets(
         deadCode: true,
         codeQuality: true,

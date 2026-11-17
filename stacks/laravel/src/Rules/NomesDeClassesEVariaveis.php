@@ -39,6 +39,9 @@ final class NomesDeClassesEVariaveis implements Rule
      */
     public const VARIAVEIS_CURTAS_OK = ['i', 'j', 'k', 'e', 'id', 'uf', 'ip', 'db', 'os'];
 
+    /** Superglobais do PHP: o nome é da linguagem, não do projeto. */
+    private const SUPERGLOBAIS = ['GLOBALS', '_SERVER', '_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_REQUEST', '_ENV'];
+
     /** @var list<string> */
     private readonly array $curtasPermitidas;
 
@@ -109,7 +112,7 @@ final class NomesDeClassesEVariaveis implements Rule
         $vistas = [];
 
         foreach ($finder->findInstanceOf($stmts, Variable::class) as $variavel) {
-            if (!is_string($variavel->name) || $variavel->name === 'this') {
+            if (!is_string($variavel->name) || $variavel->name === 'this' || in_array($variavel->name, self::SUPERGLOBAIS, true)) {
                 continue;
             }
 

@@ -1,4 +1,5 @@
-# Regras de dependência entre camadas (Deptrac 2).
+# Regras de dependência entre camadas (Deptrac 2 a 4; pacote deptrac/deptrac).
+# As camadas são definidas por pasta (collector "directory"), que funciona em todas essas versões.
 # Controllers falam com services, requests, resources e enums.
 # Services falam com models, enums, events e jobs.
 # Models só falam com enums. Ninguém da regra de negócio conhece Http.
@@ -8,36 +9,36 @@ deptrac:
     layers:
         - name: Controllers
           collectors:
-              - type: className
-                regex: .*\\Http\\Controllers\\.*
+              - type: directory
+                value: app/Http/Controllers/.*
         - name: Requests
           collectors:
-              - type: className
-                regex: .*\\Http\\Requests\\.*
+              - type: directory
+                value: app/Http/Requests/.*
         - name: Resources
           collectors:
-              - type: className
-                regex: .*\\Http\\Resources\\.*
+              - type: directory
+                value: app/Http/Resources/.*
         - name: Services
           collectors:
-              - type: className
-                regex: .*\\Services\\.*
+              - type: directory
+                value: app/Services/.*
         - name: Models
           collectors:
-              - type: className
-                regex: .*\\Models\\.*
+              - type: directory
+                value: app/Models/.*
         - name: Enums
           collectors:
-              - type: className
-                regex: .*\\Enums\\.*
+              - type: directory
+                value: app/Enums/.*
         - name: Events
           collectors:
-              - type: className
-                regex: .*\\(Events|Listeners)\\.*
+              - type: directory
+                value: app/(Events|Listeners)/.*
         - name: Jobs
           collectors:
-              - type: className
-                regex: .*\\Jobs\\.*
+              - type: directory
+                value: app/Jobs/.*
     ruleset:
         Controllers:
             - Requests

@@ -14,10 +14,14 @@ export default tseslint.config(
     rules: {
       'no-console': ['error', { allow: ['warn', 'error'] }],
       eqeqeq: ['error', 'always'],
+      // Módulos do NestJS (@Module) são classes vazias com decorator.
+      '@typescript-eslint/no-extraneous-class': ['error', { allowWithDecorator: true }],
       '@typescript-eslint/naming-convention': [
         'error',
         { selector: 'default', format: ['camelCase'], leadingUnderscore: 'allow' },
         { selector: 'variable', format: ['camelCase', 'UPPER_CASE', 'PascalCase'] },
+        // Propriedades em MAIÚSCULAS para classes que espelham variáveis de ambiente.
+        { selector: 'classProperty', format: ['camelCase', 'UPPER_CASE'], leadingUnderscore: 'allow' },
         { selector: 'typeLike', format: ['PascalCase'] },
         { selector: 'enumMember', format: ['PascalCase', 'UPPER_CASE'] },
         { selector: ['objectLiteralProperty', 'import'], format: null },

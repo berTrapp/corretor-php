@@ -1,3 +1,4 @@
+# PHPStan 2 + Larastan 3. Tipos de iteráveis (array<K, V>) já são exigidos a partir do nível 6.
 includes:
     - vendor/larastan/larastan/extension.neon
 
@@ -7,5 +8,4 @@ parameters:
         - app
         - routes
         - config
-    checkMissingIterableValueType: true
     treatPhpDocTypesAsCertain: false

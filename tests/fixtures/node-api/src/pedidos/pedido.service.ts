@@ -8,3 +8,7 @@ export class PedidoService {
     throw new Error('pedido já faturado');
   }
 }
+
+export function buscar(id: string) {
+  throw new NotFoundException(id);
+}
