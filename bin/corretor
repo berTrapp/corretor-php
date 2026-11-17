@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Carrega o autoload do próprio pacote (desenvolvimento) ou do projeto que o instalou (vendor/bin).
+$autoload = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+];
+
+foreach ($autoload as $arquivo) {
+    if (is_file($arquivo)) {
+        require $arquivo;
+        break;
+    }
+}
+
+exit(Corretor\Cli\Application::run($argv));

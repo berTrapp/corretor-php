@@ -1,0 +1,67 @@
+# Regras de dependência entre camadas (Deptrac 2).
+# Controllers falam com services, requests, resources e enums.
+# Services falam com models, enums, events e jobs.
+# Models só falam com enums. Ninguém da regra de negócio conhece Http.
+deptrac:
+    paths:
+        - ./app
+    layers:
+        - name: Controllers
+          collectors:
+              - type: className
+                regex: .*\\Http\\Controllers\\.*
+        - name: Requests
+          collectors:
+              - type: className
+                regex: .*\\Http\\Requests\\.*
+        - name: Resources
+          collectors:
+              - type: className
+                regex: .*\\Http\\Resources\\.*
+        - name: Services
+          collectors:
+              - type: className
+                regex: .*\\Services\\.*
+        - name: Models
+          collectors:
+              - type: className
+                regex: .*\\Models\\.*
+        - name: Enums
+          collectors:
+              - type: className
+                regex: .*\\Enums\\.*
+        - name: Events
+          collectors:
+              - type: className
+                regex: .*\\(Events|Listeners)\\.*
+        - name: Jobs
+          collectors:
+              - type: className
+                regex: .*\\Jobs\\.*
+    ruleset:
+        Controllers:
+            - Requests
+            - Resources
+            - Services
+            - Models
+            - Enums
+        Requests:
+            - Enums
+        Resources:
+            - Models
+            - Enums
+        Services:
+            - Models
+            - Enums
+            - Events
+            - Jobs
+        Models:
+            - Enums
+        Events:
+            - Models
+            - Jobs
+        Jobs:
+            - Services
+            - Models
+            - Enums
+        Enums: []
