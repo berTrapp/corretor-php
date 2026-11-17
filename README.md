@@ -51,7 +51,7 @@ Regra desligada sem `motivo` continua ligada e gera o erro `config.excecao-sem-m
 
 | Regra | O que verifica | Severidade |
 |---|---|---|
-| `nomes.sufixo-da-classe` | classe sem o sufixo do diretório (`Controller`, `Service`...) | aviso |
+| `nomes.sufixo-da-classe` | classe sem o sufixo do diretório (`Controller`, `Request`, `Resource`, `Service`, `Policy`, `Observer`); Jobs e Listeners seguem o Laravel e não exigem sufixo | aviso |
 | `nomes.metodo-camel-case` | método fora de camelCase | erro |
 | `nomes.variavel-camel-case` | variável fora de camelCase | erro |
 | `nomes.variavel-abreviada` | variável de uma ou duas letras (exceto `$i`, `$j`, `$k`, `$e`, `$id`, `$uf`, `$ip`, `$db`, `$os` e as de `.padrao.yaml`); uma vez por arquivo | aviso |

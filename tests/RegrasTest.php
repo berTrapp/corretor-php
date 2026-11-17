@@ -203,4 +203,24 @@ final class RegrasTest extends TestCase
 
         $this->assertSame([], $violacoes);
     }
+
+    public function testJobsEListenersNaoExigemSufixo(): void
+    {
+        $regra = new NomesDeClassesEVariaveis();
+        $job = '<?php class ProcessarPodcast {}';
+        $listener = '<?php class EnviarNotificacaoDeEnvio {}';
+        $comSufixo = '<?php class EnviarEmailJob {}';
+
+        $this->assertSame([], $this->verificar($regra, '/projeto/app/Jobs/ProcessarPodcast.php', $job));
+        $this->assertSame([], $this->verificar($regra, '/projeto/app/Listeners/EnviarNotificacaoDeEnvio.php', $listener));
+        $this->assertSame([], $this->verificar($regra, '/projeto/app/Jobs/EnviarEmailJob.php', $comSufixo));
+    }
+
+    public function testServiceAindaExigeSufixo(): void
+    {
+        $codigo = '<?php class Faturamento {}';
+        $violacoes = $this->verificar(new NomesDeClassesEVariaveis(), '/projeto/app/Services/Faturamento.php', $codigo);
+
+        $this->assertSame(['nomes.sufixo-da-classe'], array_map(fn ($v) => $v->regra, $violacoes));
+    }
 }

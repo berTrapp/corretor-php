@@ -27,6 +27,7 @@ Toda entrada de regra diz o identificador e o motivo.
 - Deptrac sugerido como `deptrac/deptrac` (nome do pacote a partir da versão 2).
 
 ### Corrigido
+- `nomes.sufixo-da-classe` não exige mais `Job` nem `Listener` (NOM-01a). Motivo: a documentação do Laravel nomeia Jobs e Listeners pela ação, sem sufixo; a exigência gerava avisos em código que segue o framework (169 dos 330 avisos no akaunting). Classes que já têm o sufixo continuam aceitas. Services mantêm o sufixo por decisão da casa.
 - Presets validados com as versões atuais em projetos públicos (koel, nestjs-boilerplate):
   - `phpstan.neon`: removido `checkMissingIterableValueType`, que não existe no PHPStan 2 e impedia a execução.
   - `deptrac.yaml`: collector `className` (removido no Deptrac 4) trocado por `directory`.

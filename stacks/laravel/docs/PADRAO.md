@@ -66,7 +66,8 @@ tests/
 
 | ID | Regra | Verificação |
 |---|---|---|
-| NOM-01 | Classes terminam com o sufixo do diretório: `Controller`, `Request`, `Resource`, `Service`, `Policy`, `Observer`, `Listener`, `Job`. | `nomes.sufixo-da-classe` |
+| NOM-01 | Classes terminam com o sufixo do diretório: `Controller`, `Request`, `Resource`, `Service`, `Policy`, `Observer`. | `nomes.sufixo-da-classe` |
+| NOM-01a | Jobs e Listeners **não** precisam de sufixo: são nomeados pela ação, como na documentação do Laravel (`ProcessarPodcast`, `EnviarNotificacaoDeEnvio`). Os que já têm sufixo (`EnviarEmailJob`) continuam aceitos e não precisam ser renomeados; em código novo, prefira o nome da ação. | revisão |
 | NOM-02 | Classes em PascalCase, substantivos no singular (`Pedido`, `PedidoService`). | revisão |
 | NOM-03 | Models são singulares (`Pedido`); a tabela é plural (`pedidos`). | revisão |
 | NOM-04 | Enums em PascalCase, casos em PascalCase (`StatusPedido::Aberto`). | revisão |
@@ -174,6 +175,8 @@ Este padrão adota **services**, e não actions. Repositórios não são obrigat
 | MOD-05 | Scopes para filtros reutilizáveis (`scopeAtivos`), não consultas repetidas. | revisão |
 
 ### 4.6 Jobs, Events e Listeners
+
+Decisão (NOM-01a): Jobs e Listeners seguem a convenção do Laravel e são nomeados pela ação, sem sufixo `Job` ou `Listener`. A pasta (`app/Jobs`, `app/Listeners`) já diz o papel, e o `make:job`/`make:listener` não acrescenta sufixo. Services, ao contrário, mantêm o sufixo `Service` por decisão da casa: o Laravel não define convenção para eles, e o sufixo distingue o service das classes de apoio na mesma pasta.
 
 | ID | Regra | Verificação |
 |---|---|---|

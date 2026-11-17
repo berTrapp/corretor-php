@@ -21,7 +21,12 @@ use PhpParser\NodeFinder;
  */
 final class NomesDeClassesEVariaveis implements Rule
 {
-    /** Diretório => sufixo obrigatório do nome da classe. */
+    /**
+     * Diretório => sufixo obrigatório do nome da classe (NOM-01).
+     * Jobs e Listeners ficam de fora de propósito: a documentação do Laravel os nomeia
+     * pela ação (ProcessPodcast, SendShipmentNotification), sem sufixo. Services entram
+     * por decisão da casa, não do framework.
+     */
     private const SUFIXOS = [
         'app/Http/Controllers' => 'Controller',
         'app/Http/Requests' => 'Request',
@@ -29,8 +34,6 @@ final class NomesDeClassesEVariaveis implements Rule
         'app/Services' => 'Service',
         'app/Policies' => 'Policy',
         'app/Observers' => 'Observer',
-        'app/Listeners' => 'Listener',
-        'app/Jobs' => 'Job',
     ];
 
     /**
