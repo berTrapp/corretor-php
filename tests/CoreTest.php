@@ -47,6 +47,18 @@ final class CoreTest extends TestCase
         $this->assertSame(['nf'], $config->nomesCurtos);
     }
 
+    public function testIgnorarPastasEGlobs(): void
+    {
+        file_put_contents($this->tmp . '/.padrao.yaml', "ignorar:\n  - overrides/\n  - 'app/Legacy/*.php'\n");
+
+        $config = Config::carregar($this->tmp);
+
+        $this->assertTrue($config->ignorado('overrides/symfony/process/Finder.php'));
+        $this->assertTrue($config->ignorado('app/Legacy/Velho.php'));
+        $this->assertFalse($config->ignorado('app/Services/PedidoService.php'));
+        $this->assertFalse($config->ignorado('app/overrides.php'));
+    }
+
     public function testSemArquivoDeConfigNadaMuda(): void
     {
         $config = Config::carregar($this->tmp);

@@ -16,6 +16,9 @@ use Symfony\Component\Yaml\Yaml;
  *     - regra: nomes.variavel-abreviada
  *       motivo: "Código legado; revisar no módulo de vendas."
  *   nomes-curtos-permitidos: [cd, nf]
+ *   ignorar:                       # pastas ou globs, relativos à raiz
+ *     - overrides/
+ *     - "app/Legacy/**"
  *
  * Regra desligada sem motivo não é desligada e vira violação config.excecao-sem-motivo.
  */
@@ -28,12 +31,14 @@ final class Config
      * @param array<string, string> $desligadas regra => motivo
      * @param list<string> $nomesCurtos
      * @param list<Violation> $problemas
+     * @param list<string> $ignorar
      */
     public function __construct(
         public readonly array $stacks = [],
         public readonly array $desligadas = [],
         public readonly array $nomesCurtos = [],
         public readonly array $problemas = [],
+        public readonly array $ignorar = [],
     ) {
     }
 
@@ -84,7 +89,24 @@ final class Config
 
         $nomesCurtos = array_values(array_map('strval', (array) ($dados['nomes-curtos-permitidos'] ?? [])));
 
-        return new self($stacks, $desligadas, $nomesCurtos, $problemas);
+        $ignorar = array_values(array_map(
+            static fn ($p): string => preg_replace('#^\./#', '', str_replace('\\', '/', (string) $p)),
+            (array) ($dados['ignorar'] ?? []),
+        ));
+
+        return new self($stacks, $desligadas, $nomesCurtos, $problemas, $ignorar);
+    }
+
+    /** Caminho relativo à raiz, com /. "pasta/" ignora tudo abaixo; o resto é glob (fnmatch). */
+    public function ignorado(string $arquivo): bool
+    {
+        foreach ($this->ignorar as $padrao) {
+            if (str_ends_with($padrao, '/') ? str_starts_with($arquivo, $padrao) : fnmatch($padrao, $arquivo)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function desligada(string $regra): bool

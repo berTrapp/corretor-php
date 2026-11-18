@@ -66,7 +66,7 @@ final class Application
 
         $violacoes = array_values(array_filter(
             array_map(static fn (Violation $v): Violation => $v->relativaA($raiz), $violacoes),
-            static fn (Violation $v): bool => !$config->desligada($v->regra),
+            static fn (Violation $v): bool => !$config->desligada($v->regra) && !$config->ignorado($v->arquivo),
         ));
 
         $nomes = array_map(static fn (Stack $s): string => $s->nome(), $stacks);

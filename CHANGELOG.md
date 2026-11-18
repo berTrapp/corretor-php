@@ -8,9 +8,11 @@ Segue [versionamento semântico](https://semver.org/lang/pt-BR/) aplicado ao pad
 
 Toda entrada de regra diz o identificador e o motivo.
 
-## [Não publicado]
+## [0.2.0] - 2026-11-18
 
 ### Adicionado
+- `.padrao.yaml`: `ignorar:` com pastas ou globs que ficam fora do relatório (ex.: `overrides/` com código de terceiros).
+- Skill `padronizar-node`; o skill `padronizar-laravel` lê o novo formato do relatório e orienta o uso do `.padrao.yaml`.
 - `camadas.sem-http` (node, aviso): exceção HTTP lançada em service.
 - Stack **node** (Node/TypeScript), com regras em YAML executadas pelo ast-grep: `geral.depuracao-esquecida`, `geral.env-fora-de-config`, `erros.catch-vazio`, `erros.excecao-generica`, `erros.mensagem-exposta`, `erros.try-catch-em-controller`, `controller.sem-regra-de-negocio`, `rotas.convencoes`, `nomes.variavel-camel-case`. Os IDs são os mesmos do Laravel quando a intenção é a mesma.
 - Presets node: ESLint (typescript-eslint estrito), `tsconfig.padrao.json`, Prettier, dependency-cruiser, EditorConfig.
@@ -20,6 +22,7 @@ Toda entrada de regra diz o identificador e o motivo.
 - Laravel: `erros.excecao-generica`, `erros.try-catch-em-controller`, `erros.handler-central-vazio`, `erros.mensagem-exposta`, `erros.catch-vazio` (ERR-01 a ERR-04), antes só revisão.
 
 ### Mudado
+- Pint: `declare_strict_types` saiu do preset (EST-STY-02 passa a ser revisão). Motivo: aplicado de uma vez em projeto existente, muda a conversão de tipos em tempo de execução e pode quebrar código sem aviso. Ative no `pint.json` quando o projeto já estiver todo com `strict_types`.
 - Estrutura: núcleo em `src/`, cada stack em `stacks/<nome>/` (docs, presets, regras, skills).
 - Caminhos no relatório são relativos à raiz analisada.
 - Código de saída 1 só quando há violação de severidade **erro**; avisos não bloqueiam.

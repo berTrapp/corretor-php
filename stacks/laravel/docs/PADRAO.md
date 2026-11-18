@@ -250,7 +250,7 @@ Decisão (NOM-01a): Jobs e Listeners seguem a convenção do Laravel e são nome
 | ID | Regra | Ferramenta |
 |---|---|---|
 | EST-STY-01 | Formatação conforme PER Coding Style 2.0, aplicada pelo Pint. | `pint.json` |
-| EST-STY-02 | `declare(strict_types=1);` em todo arquivo PHP. | Pint (`declare_strict_types`) |
+| EST-STY-02 | `declare(strict_types=1);` em todo arquivo PHP novo. Em código existente, adotar por pasta, com testes, porque muda a conversão de tipos em tempo de execução. | revisão (fora do preset do Pint de propósito; ative `declare_strict_types` no `pint.json` quando o projeto inteiro já tiver) |
 | EST-STY-03 | Tipos declarados em parâmetros, retornos e propriedades. | PHPStan nível 8 |
 | EST-STY-04 | Imports ordenados e sem imports não usados. | Pint |
 | EST-STY-05 | Dependências entre camadas respeitam o grafo do `deptrac.yaml`. | Deptrac |

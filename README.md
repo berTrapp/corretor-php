@@ -43,9 +43,12 @@ desligar:
   - regra: controller.consulta-eloquent-direta
     motivo: "Controllers de relatório só leem; migrar para services no módulo financeiro."
 nomes-curtos-permitidos: [nf, cd]
+ignorar:                      # pastas (terminadas em /) ou globs, relativos à raiz
+  - overrides/
+  - "app/Legacy/*.php"
 ```
 
-Regra desligada sem `motivo` continua ligada e gera o erro `config.excecao-sem-motivo`. As regras desligadas aparecem no relatório.
+Use `ignorar` para o que não é código do projeto (cópias de terceiros, código gerado). Regra desligada sem `motivo` continua ligada e gera o erro `config.excecao-sem-motivo`. As regras desligadas aparecem no relatório.
 
 ## Regras automatizadas: Laravel
 
@@ -87,6 +90,10 @@ Regra desligada sem `motivo` continua ligada e gera o erro `config.excecao-sem-m
 
 O que não é automatizado (decisões de domínio, desenho de API, banco) está no `PADRAO.md` de cada stack e é verificado em revisão de código.
 
+## Skills do Claude
+
+- `stacks/laravel/skills/padronizar-laravel/` e `stacks/node/skills/padronizar-node/`: diagnóstico, plano aprovado, correção em passos pequenos e validação. Copie a pasta da stack para `.claude/skills/` do projeto.
+
 ## CI e hooks
 
 - `templates/ci/<stack>.yml`: GitHub Actions que roda formatador, análise estática, camadas, o corretor e os testes. Copie para `.github/workflows/padrao.yml`.
@@ -103,7 +110,7 @@ src/Adapters/AstGrep.php             motor das stacks não PHP
 src/Report/Relatorio.php             relatório em md e json
 schemas/relatorio.schema.json        contrato do relatório (versionado)
 stacks/laravel/                      docs/, presets/, skills/, src/ (regras PHP)
-stacks/node/                         docs/, presets/, rules/ (YAML), tests/ (casos do ast-grep)
+stacks/node/                         docs/, presets/, rules/ (YAML), skills/, tests/ (casos do ast-grep)
 templates/ci/, templates/hooks/      por stack
 tests/                               PHPUnit: regras Laravel, núcleo e stack node
 ```
