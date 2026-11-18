@@ -11,6 +11,8 @@ O piso são as ferramentas oficiais de cada stack (formatador, análise estátic
 
 ## Uso
 
+O pacote está no [Packagist](https://packagist.org/packages/bertrapp/corretor-php): não é preciso clonar este repositório para usar o padrão. O clone só serve para desenvolver o próprio pacote (regras, presets).
+
 Laravel:
 
 ```bash
@@ -27,6 +29,10 @@ npm i -D @ast-grep/cli
 corretor instalar
 corretor analisar
 ```
+
+Requisitos: PHP 8.3+ e Composer na máquina ou no CI. A pasta global do Composer precisa estar no `PATH` (em geral `~/.config/composer/vendor/bin`; confira com `composer global config bin-dir --absolute`).
+
+Atualizar para uma versão nova: `composer update bertrapp/corretor-php` no projeto, ou `composer global update bertrapp/corretor-php` na instalação global. As mudanças de cada versão estão no [CHANGELOG](CHANGELOG.md).
 
 Opções:
 
