@@ -8,6 +8,13 @@ Segue [versionamento semântico](https://semver.org/lang/pt-BR/) aplicado ao pad
 
 Toda entrada de regra diz o identificador e o motivo.
 
+## [Não publicado]
+
+### Mudado
+- `corretor instalar` só copia `rector.php` quando `rector/rector` e `driftingly/rector-laravel` estão no `composer.json`; o Rector passa a ser opcional e sai das dependências sugeridas.
+- `corretor instalar` adiciona `padrao-relatorio.json` e `.deptrac.cache` ao `.gitignore`, sem duplicar entradas.
+- Skill `padronizar-laravel` adaptado a projetos legados: pacote ausente, Pint só nos arquivos alterados, Rector opcional, prioridade das regras do projeto, Docker/Sail, banco de testes isolado e correspondência entre regras do relatório e identificadores do padrão.
+
 ## [0.2.0] - 2026-11-18
 
 ### Adicionado

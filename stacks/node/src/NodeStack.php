@@ -36,4 +36,14 @@ final class NodeStack implements Stack
     {
         return 'npm i -D @ast-grep/cli eslint @eslint/js typescript-eslint prettier dependency-cruiser typescript';
     }
+
+    public function presetsCondicionais(): array
+    {
+        return [];
+    }
+
+    public function arquivosGerados(): array
+    {
+        return [];
+    }
 }

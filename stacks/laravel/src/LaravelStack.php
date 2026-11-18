@@ -45,7 +45,17 @@ final class LaravelStack implements Stack
     public function dependenciasSugeridas(): string
     {
         return 'composer require --dev laravel/pint larastan/larastan phpstan/phpstan '
-            . 'deptrac/deptrac driftingly/rector-laravel rector/rector';
+            . 'deptrac/deptrac';
+    }
+
+    public function presetsCondicionais(): array
+    {
+        return ['rector.php' => ['rector/rector', 'driftingly/rector-laravel']];
+    }
+
+    public function arquivosGerados(): array
+    {
+        return ['.deptrac.cache'];
     }
 
     /**

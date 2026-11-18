@@ -26,4 +26,18 @@ interface Stack
 
     /** Comando sugerido para instalar as ferramentas oficiais da stack. */
     public function dependenciasSugeridas(): string;
+
+    /**
+     * Presets que só fazem sentido com certas dependências no composer.json do projeto.
+     *
+     * @return array<string, list<string>> arquivo do preset => pacotes exigidos
+     */
+    public function presetsCondicionais(): array;
+
+    /**
+     * Arquivos que as ferramentas da stack geram na raiz e não devem ser versionados.
+     *
+     * @return list<string>
+     */
+    public function arquivosGerados(): array;
 }

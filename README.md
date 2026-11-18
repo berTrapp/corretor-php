@@ -17,7 +17,7 @@ Laravel:
 
 ```bash
 composer require --dev bertrapp/corretor-php
-vendor/bin/corretor instalar          # copia os presets da stack para a raiz do projeto
+vendor/bin/corretor instalar          # copia os presets e atualiza o .gitignore; rector.php só se o Rector estiver no composer.json
 vendor/bin/corretor analisar          # relatório no terminal
 ```
 
@@ -30,7 +30,7 @@ corretor instalar
 corretor analisar
 ```
 
-Requisitos: PHP 8.3+ e Composer na máquina ou no CI. A pasta global do Composer precisa estar no `PATH` (em geral `~/.config/composer/vendor/bin`; confira com `composer global config bin-dir --absolute`).
+Requisitos: PHP 8.2+ e Composer na máquina ou no CI. A pasta global do Composer precisa estar no `PATH` (em geral `~/.config/composer/vendor/bin`; confira com `composer global config bin-dir --absolute`).
 
 Atualizar para uma versão nova: `composer update bertrapp/corretor-php` no projeto, ou `composer global update bertrapp/corretor-php` na instalação global. As mudanças de cada versão estão no [CHANGELOG](CHANGELOG.md).
 
